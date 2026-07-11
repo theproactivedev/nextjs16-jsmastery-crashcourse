@@ -1,9 +1,16 @@
+'use client';
+
 import Link from "next/link";
 import Image from "next/image";
+import posthog from "posthog-js";
 import { EventItem } from "@/lib/constants";
 
 const EventCard = ({ title, image, slug, location, date, time }: EventItem) => (
-    <Link href="/events" id="event-card">
+    <Link
+        href="/events"
+        id="event-card"
+        onClick={() => posthog.capture('event_card_clicked', { event_title: title, event_slug: slug, event_location: location, event_date: date })}
+    >
         <Image src={image} alt={title} width={410} height={300} className="poster" />
 
         <div className="flex flex-row gap-2">
