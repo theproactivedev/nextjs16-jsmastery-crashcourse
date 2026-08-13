@@ -7,7 +7,7 @@ import { EventItem } from "@/lib/constants";
 
 const EventCard = ({ title, image, slug, location, date, time }: EventItem) => (
     <Link
-        href="/events"
+        href={`/events/${slug}`}
         id="event-card"
         onClick={() => posthog.capture('event_card_clicked', { event_title: title, event_slug: slug, event_location: location, event_date: date })}
     >
