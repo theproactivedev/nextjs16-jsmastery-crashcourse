@@ -7,7 +7,7 @@ import connectDB from "../mongodb";
 export async function getSimilarEventsBy(slug: string): Promise<IEvent[]> {
   try {
     await connectDB();
-    const event = await Event.findOne({ slug }).lean();
+    const event = (await Event.findOne({ slug })).lean();
     if(!event) {
       return [];
     }

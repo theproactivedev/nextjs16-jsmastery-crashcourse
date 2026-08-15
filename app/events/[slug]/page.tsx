@@ -4,19 +4,21 @@ import EventAgenda from "@/components/EventDetails/EventAgenda";
 import EventDetailItem from "@/components/EventDetails/EventDetailItem";
 import EventTags from "@/components/EventDetails/EventTags";
 import { IEvent } from "@/database/event.model";
+import { getAllBookingsByEventId } from "@/lib/actions/bookings.actions";
 import { getSimilarEventsBy } from "@/lib/actions/events.actions";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 
 const EventDetailPage = async ({ params } : { params: Promise<{ slug: string }> }) => {
   const { slug } = await params;
+
   const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/events/${slug}`);
   const { event } = await response.json();
-  const bookings = 10;
-
   if(!event) {
     return notFound();
   }
+
+  const bookings = await getAllBookingsByEventId(event._id);
 
   const similarEvents = await getSimilarEventsBy(slug);
 
@@ -61,15 +63,15 @@ const EventDetailPage = async ({ params } : { params: Promise<{ slug: string }> 
         <aside className="booking">
           <div className="signup-card">
             <h2>Book Your Spot</h2>
-            {bookings > 0
+            {bookings?.length > 0
               ? (
-                <p className="text-sm">Join {bookings} people who have already booked their spot!</p>
+                <p className="text-sm">Join {bookings.length} {bookings.length === 1 ? 'person' : 'people'} who have already booked their spot!</p>
               ) : (
                 <p className="text-sm">Be the first to book your spot!</p>
               )
             }
 
-            <BookEvent />
+            <BookEvent eventId={event._id} slug={event.slug} />
           </div>
         </aside>
       </div>
@@ -91,7 +93,6 @@ const EventDetailPage = async ({ params } : { params: Promise<{ slug: string }> 
           </div>
         </div>
       }
-
     </section>
   );
 };
