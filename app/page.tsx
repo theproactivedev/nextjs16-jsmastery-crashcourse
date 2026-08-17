@@ -1,13 +1,10 @@
 import ExploreBtn from "@/components/ExploreBtn";
 import EventCard from "@/components/EventCard";
 import { IEvent } from "@/database";
+import { getAllEvents } from "@/lib/actions/events.actions";
 
 export default async function Home() {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/events`);
-    if (!response.ok) {
-        throw new Error(`Fetch failed on Home: ${response.status} ${await response.text()}. URL is ${process.env.NEXT_PUBLIC_BASE_URL}/api/events`);
-    }
-    const { events } = await response.json();
+    const events = await getAllEvents();
     return (
         <section>
             <h1 className="t  ext-center">The Hub for Every Dev<br />Event You Can't Miss</h1>
@@ -18,11 +15,14 @@ export default async function Home() {
                 <h3>Featured Events</h3>
 
                 <ul className="events">
-                    {events && events.length > 0 && events.map((event: IEvent) => (
+                    {events && events.length > 0 && events.map((event: IEvent) => {
+                        const { _id, ...eventFields } = event;
+                        return (
                         <li key={event.title} className="list-none">
-                            <EventCard {...event} />
+                            <EventCard {...eventFields} />
                         </li>
-                    ))}
+                    )
+                    })}
                 </ul>
             </div>
         </section>

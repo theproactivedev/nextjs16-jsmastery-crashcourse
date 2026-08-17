@@ -4,6 +4,16 @@ import Event, { IEvent } from "@/database/event.model";
 
 import connectDB from "../mongodb";
 
+export async function getAllEvents(): Promise<IEvent[]> {
+  try {
+    await connectDB();
+    const events = await Event.find({}).lean();
+    return events;
+  } catch (error) {
+    return [];
+  }
+}
+
 export async function getSimilarEventsBy(slug: string): Promise<IEvent[]> {
   try {
     await connectDB();
