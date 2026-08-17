@@ -13,6 +13,9 @@ const EventDetails = async ({ params } : { params: Promise<string> }) => {
   const slug = await params;
 
   const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/events/${slug}`);
+  if (!response.ok) {
+      throw new Error(`Fetch failed on EventDetails: ${response.status} ${await response.text()}. URL is ${process.env.NEXT_PUBLIC_BASE_URL}/api/events/${slug}`);
+  }
   const { event } = await response.json();
   if(!event) {
     return notFound();

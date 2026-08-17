@@ -4,6 +4,9 @@ import { IEvent } from "@/database";
 
 export default async function Home() {
     const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/events`);
+    if (!response.ok) {
+        throw new Error(`Fetch failed on Home: ${response.status} ${await response.text()}. URL is ${process.env.NEXT_PUBLIC_BASE_URL}/api/events`);
+    }
     const { events } = await response.json();
     return (
         <section>
