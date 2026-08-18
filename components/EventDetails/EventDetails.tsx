@@ -5,23 +5,19 @@ import EventDetailItem from "@/components/EventDetails/EventDetailItem";
 import EventTags from "@/components/EventDetails/EventTags";
 import { IEvent } from "@/database/event.model";
 import { getAllBookingsByEventId } from "@/lib/actions/bookings.actions";
-import { getSimilarEventsBy } from "@/lib/actions/events.actions";
+import { getEvent, getSimilarEventsBy } from "@/lib/actions/events.actions";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 
 const EventDetails = async ({ params } : { params: Promise<string> }) => {
   const slug = await params;
 
-  const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/events/${slug}`);
-  if (!response.ok) {
-      throw new Error(`Fetch failed on EventDetails: ${response.status} ${await response.text()}. URL is ${process.env.NEXT_PUBLIC_BASE_URL}/api/events/${slug}`);
-  }
-  const { event } = await response.json();
+  const event = await getEvent(slug);
   if(!event) {
     return notFound();
   }
 
-  const bookings = await getAllBookingsByEventId(event._id);
+  const bookings = await getAllBookingsByEventId(event._id.toString());
 
   const similarEvents = await getSimilarEventsBy(slug);
 
@@ -74,7 +70,7 @@ const EventDetails = async ({ params } : { params: Promise<string> }) => {
               )
             }
 
-            <BookEvent eventId={event._id} slug={event.slug} />
+            <BookEvent eventId={event._id.toString()} slug={event.slug} />
           </div>
         </aside>
       </div>
