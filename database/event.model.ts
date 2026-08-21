@@ -7,7 +7,7 @@ export interface IEvent extends Document {
     description: string;
     overview: string;
     image: string;
-    venue: string;
+    venue?: string;
     location: string;
     date: string;
     time: string;
@@ -53,7 +53,7 @@ const EventSchema = new Schema<IEvent>(
         },
         venue: {
             type: String,
-            required: [true, 'Venue is required'],
+            required: [false, 'Venue is optional'],
             trim: true,
         },
         location: {

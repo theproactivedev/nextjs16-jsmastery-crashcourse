@@ -6,9 +6,9 @@ import {
   AlertTitle,
 } from "@/components/ui/alert"
 
-function AlertBox({ title, content, variant } : { title: string; content: string; variant?: "default" | "destructive" | null | undefined }) {
+function AlertBox({ title, content, variant, className } : { title: string; content: string; variant?: "default" | "destructive" | null | undefined, className: string }) {
   return (
-    <Alert variant={variant} className="max-w-md">
+    <Alert variant={variant} className={`max-w-md ${className}`}>
       <AlertCircleIcon />
       <AlertTitle>{title}</AlertTitle>
       <AlertDescription>

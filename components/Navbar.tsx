@@ -12,9 +12,9 @@ const Navbar = () => {
                 </Link>
 
                 <ul>
-                    <Link href="/">Home</Link>
-                    <Link href="/">Events</Link>
-                    <Link href="/">Create Event</Link>
+                    <Link href="/create-event" className="hover:text-terracotta">
+                        Create Event
+                    </Link>
                 </ul>
             </nav>
         </header>
