@@ -24,8 +24,9 @@ import { parseLines, validate } from "./utils";
 import SectionHeading from "./SectionHeading";
 import CharCount from "./CharCount";
 import FieldError from "@/components/shared/FieldError";
-import { Alert } from "@/components/ui/alert";
 import AlertBox from "@/components/shared/Alert";
+import { redirect } from "next/navigation";
+import Image from "next/image";
 
 
 const EventForm = () => {
@@ -36,10 +37,12 @@ const EventForm = () => {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [imageError, setImageError] = useState("");
   const [dragActive, setDragActive] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
+  const [isSuccessFul, setIsSuccessFul] = useState(false);
+  const [isFormSubmitting, setIsFormSubmitting] = useState(false);
+  const [isFormSubmitted, setIsFormSubmitted] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const setField = (name: string, value: any) => {
+  const setField = (name: string, value: string | File | string[] | null) => {
     setForm((prev) => {
       const next = { ...prev, [name]: value };
       return next;
@@ -123,12 +126,16 @@ const EventForm = () => {
     setImageError("");
     setImagePreview(null);
     setTouched({} as Record<keyof InitialForm, boolean>);
-    setSubmitted(false);
+    setIsSuccessFul(false);
+    setIsFormSubmitted(false);
+    setIsFormSubmitting(false);
   }
 
   const modeCfg = MODE_CONFIG[form.mode];
 
   const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
+    setIsFormSubmitted(true);
+    setIsFormSubmitting(true);
     e.preventDefault();
 
     const nextErrors = validate(form);
@@ -165,8 +172,13 @@ const EventForm = () => {
       });
 
       if(response.ok) {
-        setSubmitted(true);
+        setIsSuccessFul(true);
         window.setTimeout(() => resetForm(), 3500);
+        const createdEvent = await response.json();
+        setIsFormSubmitted(false);
+        if(createdEvent?.event?.slug) {
+          redirect(`/events/${createdEvent.event.slug}`);
+        }
       } else {
         const backendResponse = await response.json();
         if(backendResponse?.message) {
@@ -177,21 +189,21 @@ const EventForm = () => {
       const firstErrorField = Object.keys(nextErrors)[0];
       document.getElementById(firstErrorField)?.focus();
     }
+
+    setIsFormSubmitting(false);
   };
 
   const errorCount = Object.keys(errors).length;
-
-  console.log('errors', errors);
 
   return (
     <div className="min-h-screen w-full bg-transparent px-4 py-10 sm:px-6 lg:px-10">
       <div className="mx-auto max-w-6xl">
         <div className=" b-8">
-          <p className="mb-1 text-xs font-medium uppercase tracking-widest text-terracotta">
+          <p className="mb-1 text-xs font-medium uppercase tracking-widest text-blue">
             Events
           </p>
           <h1 className="text-2xl font-semibold tracking-tight text-white sm:text-3xl">
-            Create a new event
+            Create a New Event
           </h1>
           <p className="mt-1.5 mb-3 text-sm text-white">
             Fill in the details below — your event ticket updates live as you go.
@@ -301,7 +313,7 @@ const EventForm = () => {
                         <ImagePlus className="h-4.5 w-4.5 text-[#5b3d2e]" />
                       </div>
                       <p className="text-sm text-zinc-600">
-                        <span className="font-medium text-terracotta underline decoration-terracotta/40 underline-offset-2">
+                        <span className="font-medium text-background underline decoration-background underline-offset-2">
                           Click to upload
                         </span>{" "}
                         or drag and drop
@@ -317,11 +329,12 @@ const EventForm = () => {
                       />
                     </label>
                   ) : (
-                    <div className="relative overflow-hidden rounded-xl ring-1 ring-zinc-200">
-                      <img
+                    <div className="relative overflow-hidden rounded-xl ring-1 ring-zinc-200 h-48 w-full">
+                      <Image
+                        fill
                         src={imagePreview}
                         alt="Event cover preview"
-                        className="h-48 w-full object-cover"
+                        className="object-cover"
                       />
                       <Button
                         type="button"
@@ -540,7 +553,7 @@ const EventForm = () => {
                           value: "typescript",
                         },
                       ]}
-                      value={form.tags}
+                      value={form.tags || []}
                       onChange={handleTagsChange}
                       placeholder="Add tags..."
                       ariaInvalid={Boolean(touched.tags && errors.tags)}
@@ -553,7 +566,7 @@ const EventForm = () => {
                           <Badge
                             key={`${tag}-${i}`}
                             variant="secondary"
-                            className="border-terracotta/30 bg-terracotta/10 font-normal text-terracotta"
+                            className="border-terracotta/30 bg-terracotta/10 font-normal text-blue"
                           >
                             {tag}
                           </Badge>
@@ -568,28 +581,22 @@ const EventForm = () => {
                 <AlertBox title="Error" content={backendError} variant="destructive" className="mb-4 bg-red-100" />
               }
 
-
               {/* Submit */}
-              <div className="flex items-center justify-between gap-4 pt-2">
-                <div className="text-zinc-500">
-                  {errorCount > 0 && Object.values(touched).some(Boolean) ? (
-                    <span className="flex items-center gap-1.5 font-medium text-red-600">
-                      <AlertCircle className="h-3.5 w-3.5" />
-                      {errorCount} field{errorCount > 1 ? "s" : ""} need attention
-                    </span>
-                  ) : submitted ? (
-                    <span className="flex items-center gap-1.5 font-medium text-emerald-600">
-                      <CheckCircle2 className="h-3.5 w-3.5" />
-                      Event created
-                    </span>
-                  ) : null}
-                </div>
+              <div className="text-zinc-500">
+                {isFormSubmitted && errorCount > 0 && Object.values(touched).some(Boolean) && (
+                  <div className="bg-destructive/60 flex items-center gap-1.5 font-medium text-white px-3 py-2 rounded-md">
+                    <AlertCircle className="h-3.5 w-3.5" />
+                    {errorCount} field{errorCount > 1 ? "s" : ""} need attention
+                  </div>
+                )}
+              </div>
+              <div className="flex items-center justify-end gap-4 pt-2">
                 <div className="flex gap-2">
-                  <Button type="button" variant="outline" className="cursor-pointer hover:bg-terracotta/90 hover:border-terracotta/90" onClick={() => resetForm()}>
+                  <Button type="button" variant="outline" className="cursor-pointer hover:bg-terracotta/90 hover:border-terracotta/90 px-5" onClick={() => resetForm()}>
                     Reset
                   </Button>
-                  <Button type="submit" className="bg-terracotta hover:bg-transparent hover:border-white cursor-pointer">
-                    Create event
+                  <Button type="submit" className="text-background bg-blue hover:bg-transparent hover:border-white hover:text-white cursor-pointer px-5">
+                    { isFormSubmitting ? "Creating event..." : "Create event" }
                   </Button>
                 </div>
               </div>
@@ -602,17 +609,3 @@ const EventForm = () => {
 }
 
 export default EventForm;
-
-
-// { "title": "Design Systems Summit 2026",
-//   "overview": "A one-day summit for product & design teams",
-//   "description": "Join industry leaders to explore building scalable design systems, component architecture, and cross-team workflows. Talks, hands-on workshops, and networking for practitioners.",
-//   "date": "2026-11-12",
-//   "time": "09:30",
-//   "mode": "hybrid",
-//   "venue": "Grand Ballroom, Hilton Hotel",
-//   "location": "123 Main St, San Francisco, CA / https://livestream.example.com", "audience": "Product designers, PMs, and engineering leads",
-//   "agenda": "09:00 — Doors open\n10:00 — Keynote: Designing for Scale\n11:30 — Workshop: Component Libraries\n13:00 — Lunch\n14:00 — Panel: Design Systems in Practice\n16:00 — Networking", 
-//   "organizer": "Acme Design Guild",
-//   "tags": ["design-systems", "react", "nextjs"]
-// }

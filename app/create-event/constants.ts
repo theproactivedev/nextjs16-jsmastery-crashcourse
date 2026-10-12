@@ -55,7 +55,7 @@ type InitialForm = {
   audience: string;
   agenda: string;
   organizer: string;
-  tags: string[];
+  tags: string[] | null;
 };
 
 const initialForm: InitialForm = {

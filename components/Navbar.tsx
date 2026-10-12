@@ -8,11 +8,11 @@ const Navbar = () => {
                 <Link href="/" className="logo">
                     <Image src="/icons/logo.png" alt="logo" width={24} height={24} />
 
-                    <p>DevEvent</p>
+                    <p>TaraEvent</p>
                 </Link>
 
                 <ul>
-                    <Link href="/create-event" className="hover:text-terracotta">
+                    <Link href="/create-event" className="hover:text-blue">
                         Create Event
                     </Link>
                 </ul>

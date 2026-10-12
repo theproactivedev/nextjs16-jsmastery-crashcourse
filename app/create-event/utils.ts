@@ -38,7 +38,6 @@ const validate = (form: InitialForm) => {
     errors.mode = 'Mode is required';
   }
 
-  console.log('form.mode:', form.mode);
   if (['offline', 'hybrid'].includes(form.mode) && !form.venue?.trim()) {
     errors.venue = MODE_CONFIG[form.mode].venueLabel + " is required.";
   }

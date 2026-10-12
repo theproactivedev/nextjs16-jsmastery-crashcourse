@@ -1,6 +1,6 @@
 # PostHog post-wizard report
 
-The wizard has completed a PostHog integration for the DevEvent Next.js App Router application. PostHog is initialized via `instrumentation-client.ts` (the recommended Next.js 15.3+ pattern), with a reverse proxy configured in `next.config.ts` to route events through `/ingest` and avoid ad blockers. Two client-side events are now captured: one when users click "Explore Events" on the homepage hero, and one when users click on an event card. Event card clicks include the event title, slug, location, and date as properties for rich segmentation.
+The wizard has completed a PostHog integration for the TaraEvent Next.js App Router application. PostHog is initialized via `instrumentation-client.ts` (the recommended Next.js 15.3+ pattern), with a reverse proxy configured in `next.config.ts` to route events through `/ingest` and avoid ad blockers. Two client-side events are now captured: one when users click "Explore Events" on the homepage hero, and one when users click on an event card. Event card clicks include the event title, slug, location, and date as properties for rich segmentation.
 
 | Event name | Description | File |
 |---|---|---|

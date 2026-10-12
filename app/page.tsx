@@ -6,7 +6,7 @@ export default async function Home() {
     const events = await getAllEvents();
     return (
         <section>
-            <h1 className="text-center">The Hub for Every Dev<br />Event You Can't Miss</h1>
+            <h1 className="text-center">The Hub for Every Virtual<br />Event You Can&apos;t Miss</h1>
             <p className="text-center mt-5">Hackathons, Meetups and Conferences, All in One Place</p>
 
             <div className="mt-15 mb-10 space-y-7">
