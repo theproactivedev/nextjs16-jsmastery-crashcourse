@@ -1,6 +1,7 @@
 import { Event } from "@/database";
 import connectDB from "@/lib/mongodb";
 import { NextRequest, NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { v2 as cloudinary } from 'cloudinary';
 
 
@@ -34,14 +35,15 @@ export async function POST(req: NextRequest) {
         });
         event.image = (uploadedImageResult as { secure_url: string }).secure_url;
 
-        let tags = JSON.parse(formData.get('tags') as string);
-        let agenda = JSON.parse(formData.get('agenda') as string);
+        const tags = JSON.parse(formData.get('tags') as string);
+        const agenda = JSON.parse(formData.get('agenda') as string);
 
         const createdEvent = await Event.create({
             ...event,
             tags: tags,
             agenda: agenda,
         });
+        revalidatePath('/'); // Revalidate the home page to reflect the new event
         return NextResponse.json({ message: 'Event created successfully', event: createdEvent }, { status: 201 });
     } catch(e) {
         console.error('Error creating event:', e);
