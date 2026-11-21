@@ -2,6 +2,8 @@ import EventCard from "@/components/EventCard";
 import { IEvent } from "@/database";
 import { getAllEvents } from "@/lib/actions/events.actions";
 
+export const dynamic = 'force-dynamic';
+
 export default async function Home() {
     const events = await getAllEvents();
     return (
